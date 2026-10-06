@@ -107,6 +107,15 @@ indica qué campo falló.
 - [ ] `AnioPublicacion` 1449 devuelve 400; 1450 es válido; sin año también es válido.
 - [ ] `CantidadEjemplares` 0 y 101 devuelven 400; 1 y 100 son válidos.
 
+## Limitaciones conocidas
+
+- **ISBN duplicado con requests simultáneos.** El servicio revisa si el ISBN ya existe antes
+  de guardar (RN-04). Si dos requests crean o actualizan un libro con el mismo ISBN *al mismo
+  tiempo*, las dos pueden pasar esa revisión. En ese caso el índice único de la base de datos
+  impide el duplicado, pero la segunda request recibe un **500** en vez de un 409.
+  Se acepta por simplicidad: es un caso muy poco probable en esta app y los datos nunca quedan
+  duplicados.
+
 ## Decisiones
 
 Respuestas a las preguntas que estaban abiertas en el borrador.
