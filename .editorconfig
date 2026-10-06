@@ -1,0 +1,59 @@
+# Archivo raíz: detiene la búsqueda de .editorconfig en carpetas superiores.
+root = true
+
+# ----------------------------------------------------------------------------
+# Configuración por defecto para todo tipo de archivo
+# ----------------------------------------------------------------------------
+[*]
+indent_style = space
+end_of_line = crlf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# Archivos de proyecto / configuración: indentación de 2 espacios.
+[*.{csproj,props,targets,json,yml,yaml,xml,config}]
+indent_size = 2
+
+# ----------------------------------------------------------------------------
+# Convenciones de C#
+# ----------------------------------------------------------------------------
+[*.cs]
+indent_size = 4
+
+# --- Estilo "var" ------------------------------------------------------
+# Usar "var" solo cuando el tipo es evidente por el lado derecho de la
+# asignación (por ejemplo: var libro = new Libro(); ).
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# --- Llaves en línea nueva (estilo Allman) ------------------------------
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+
+# --- Llaves obligatorias -------------------------------------------------
+# Incluso en bloques de una sola línea (if, for, etc.) para mayor claridad.
+csharp_prefer_braces = true:suggestion
+
+# --- Orden y organización ------------------------------------------------
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# --- Modificadores de acceso ----------------------------------------------
+# Siempre explícitos (public, private, etc.) y en un orden consistente.
+dotnet_style_require_accessibility_modifiers = always:suggestion
+csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:suggestion
+
+# --- Expresiones simples --------------------------------------------------
+csharp_style_expression_bodied_methods = false:silent
+csharp_style_expression_bodied_properties = true:silent
+
+# Nota: todas las reglas de estilo usan severidad "suggestion" o "silent",
+# nunca "warning" ni "error". Como Directory.Build.props activa
+# TreatWarningsAsErrors, una regla de estilo en "warning" rompería el build
+# por motivos puramente cosméticos.

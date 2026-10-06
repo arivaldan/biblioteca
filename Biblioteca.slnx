@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Biblioteca.Api/Biblioteca.Api.csproj" />
+    <Project Path="src/Biblioteca.Contracts/Biblioteca.Contracts.csproj" />
+    <Project Path="src/Biblioteca.Web/Biblioteca.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Biblioteca.Api.Tests/Biblioteca.Api.Tests.csproj" />
+  </Folder>
+</Solution>

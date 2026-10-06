@@ -1,0 +1,3 @@
+@Biblioteca.Api_HostAddress = http://localhost:5211
+
+### Agrega aquí las peticiones de prueba de tus endpoints.

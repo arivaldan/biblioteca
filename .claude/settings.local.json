@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet new gitignore *)",
+      "Bash(dotnet new webapi *)",
+      "Bash(dotnet new mvc *)",
+      "Bash(dotnet new classlib *)",
+      "Bash(dotnet new xunit *)",
+      "Bash(dotnet sln *)",
+      "Bash(dotnet build *)",
+      "Bash(dotnet test *)"
+    ]
+  }
+}

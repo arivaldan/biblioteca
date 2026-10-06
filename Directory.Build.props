@@ -1,0 +1,27 @@
+<Project>
+
+  <!--
+    Propiedades comunes a TODOS los proyectos de la solución (src y tests).
+    MSBuild aplica este archivo automáticamente a cualquier .csproj en esta
+    carpeta o en subcarpetas, sin necesidad de referenciarlo a mano.
+  -->
+  <PropertyGroup>
+
+    <!-- Versión de .NET contra la que compilan todos los proyectos. -->
+    <TargetFramework>net10.0</TargetFramework>
+
+    <!-- Activa el chequeo de nulabilidad del compilador (string? vs string). -->
+    <Nullable>enable</Nullable>
+
+    <!-- Permite usar tipos comunes (Console, List<T>, etc.) sin "using" explícito. -->
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!--
+      Cualquier warning del compilador se trata como error y rompe el build.
+      Obliga a mantener el código limpio desde el primer día.
+    -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- TargetFramework, Nullable e ImplicitUsings vienen de Directory.Build.props -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\Biblioteca.Contracts\Biblioteca.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
