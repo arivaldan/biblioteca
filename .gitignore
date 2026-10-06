@@ -480,3 +480,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Claude Code: settings.json es compartido (se versiona); settings.local.json es
+# la config/overrides personales de cada desarrollador y no debe commitearse.
+.claude/settings.local.json
