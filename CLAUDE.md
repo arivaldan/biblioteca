@@ -8,6 +8,8 @@ App pedagógica de préstamo de libros (`Libro`, `Socio`, `Préstamo`) para apre
 apoyado por IA. Será traspasada a otro desarrollador junior para que la continúe: prioriza
 código simple y legible sobre soluciones elegantes o genéricas.
 
+Antes de empezar una tarea, lee `docs/estado-actual.md`.
+
 ## Comandos
 
 ```bash
