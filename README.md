@@ -1,8 +1,7 @@
 # Biblioteca
 
-App pedagógica de préstamo de libros (`Libro`, `Socio`, `Préstamo`) para aprender desarrollo
-apoyado por IA con [Claude Code](https://code.claude.com/docs). Está pensada para que un
-desarrollador junior la continúe: prioriza código simple y legible.
+App de préstamo de libros (`Libro`, `Socio`, `Préstamo`) 
+apoyado por IA con [Claude Code](https://code.claude.com/docs). prioriza código simple y legible.
 
 ## Empezar
 
