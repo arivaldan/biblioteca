@@ -27,15 +27,10 @@
 
 ## Próximas fases (en orden)
 
-1. **Socio:** igual que Libro (Api + Web). Antes de empezar, crear una skill `/nueva-entidad`
-   basada en lo aprendido con Libro. Lo aprendido en la Web:
-   - Un cliente tipado por entidad (`ApiClients/<Entidad>ApiClient.cs`) que devuelve
-     `RespuestaApi<T>`; reutilizar `RespuestaApi` y `HttpMessageHandlerFalso`.
-   - Las claves de error de la Api coinciden con las propiedades de los DTOs: se copian tal
-     cual a `ModelState`.
-   - Un `int` obligatorio en un DTO necesita `[Required(ErrorMessage = ...)]` para que el
-     mensaje de la validación en el navegador salga en español.
-   - Activar Socios en el menú lateral y en la portada (quitar "Próximamente").
+1. **Socio:** igual que Libro (Api + Web). Empezar con `/nueva-entidad Socio`: la skill
+   (`.claude/skills/nueva-entidad/SKILL.md`) tiene los pasos, los archivos molde de Libro y lo
+   aprendido. Al ser la segunda entidad, plantear en el plan lo que hay que generalizar
+   (`Resultado<T>`/`RespuestaApi<T>` con `IsbnDuplicado`, `_ModalFormulario` y `site.js`).
 2. **Préstamo:** máximo 3 préstamos por socio, control de stock y devoluciones. Resolver las
    preguntas diferidas 14 y 15 de la spec de Libro. Completar el "Historial de préstamos" del
    detalle de libro.
