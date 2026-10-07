@@ -11,6 +11,12 @@
     </PackageReference>
     <!-- Proveedor de EF Core para SQL Server LocalDB (trae EF Core como dependencia). -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12" />
+    <!--
+      Solo la interfaz web de Swagger para probar los endpoints desde el navegador.
+      El documento OpenAPI ya lo genera Microsoft.AspNetCore.OpenApi (/openapi/v1.json);
+      por eso no se usa el paquete Swashbuckle.AspNetCore completo.
+    -->
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.3.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -27,7 +27,15 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    // Documento OpenAPI en /openapi/v1.json (lo genera Microsoft.AspNetCore.OpenApi).
     app.MapOpenApi();
+
+    // Interfaz de Swagger en /swagger para probar los endpoints desde el navegador.
+    // Solo en Development: en producción no se expone.
+    app.UseSwaggerUI(opciones =>
+    {
+        opciones.SwaggerEndpoint("/openapi/v1.json", "Biblioteca.Api v1");
+    });
 }
 
 app.UseHttpsRedirection();
