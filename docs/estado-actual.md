@@ -14,7 +14,8 @@
     "Próximamente".
   - SweetAlert2 (confirmar borrado y mensajes) y Bootstrap Icons, copiados a `wwwroot/lib`.
   - Tests de `LibrosApiClient` en `Biblioteca.Web.Tests`.
-  - Arranque múltiple Api + Web en `Biblioteca.slnLaunch`.
+  - Arranque Api + Web: perfil local de Visual Studio de cada desarrollador (pasos en `CLAUDE.md`);
+    no hay `.slnLaunch` compartido.
 
 ## Pendiente de Libro Web
 

@@ -22,9 +22,12 @@ dotnet run --project src/Biblioteca.Web         # corre el Web (http://localhost
 
 La solución es `Biblioteca.slnx` (formato XML nuevo, no `.sln`).
 
-La Web necesita la Api corriendo. En Visual Studio, el perfil "Api + Web" de
-`Biblioteca.slnLaunch` arranca las dos con un solo F5; desde la terminal, `dotnet run` de cada
-proyecto en dos terminales.
+La Web necesita la Api corriendo. Desde la terminal, `dotnet run` de cada proyecto en dos
+terminales. En Visual Studio, cada desarrollador crea su propio perfil de arranque múltiple
+(no se sube al repositorio): clic derecho en la solución → *Configurar proyectos de inicio…* →
+*Varios proyectos de inicio* → Api y Web en *Iniciar*. Visual Studio lo guarda en
+`biblioteca.slnLaunch.user`, que está en `.gitignore`. No crear un `Biblioteca.slnLaunch`
+compartido.
 
 **El build trata cualquier warning como error** (`TreatWarningsAsErrors` en
 `Directory.Build.props`). Si aparece un warning, se corrige — no se suprime.

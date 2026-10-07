@@ -103,7 +103,11 @@ formulario POST cuyo envío intercepta JavaScript para pedir la confirmación.
 
 ### Arranque
 
-- `Biblioteca.slnLaunch` define un perfil de arranque múltiple (Api + Web) para Visual Studio.
+- No hay un perfil de arranque compartido en el repositorio (decisión 10). En Visual Studio, cada desarrollador crea su propio perfil de arranque
+  múltiple (no se sube al repositorio): clic derecho en la solución → *Configurar proyectos de
+  inicio…* → *Varios proyectos de inicio* → Api y Web en *Iniciar*. Visual Studio lo guarda en
+  `biblioteca.slnLaunch.user`, que está en `.gitignore`.
+- Desde la terminal: `dotnet run` de cada proyecto en dos terminales.
 - La Web llama a la Api en `http://localhost:5211` (configurado en `appsettings` según RW-02).
 
 ## Criterios de aceptación
@@ -114,7 +118,7 @@ formulario POST cuyo envío intercepta JavaScript para pedir la confirmación.
 - [ ] El menú lateral aparece en todas las páginas y el botón hamburguesa lo colapsa y despliega.
 - [ ] Desde el menú lateral se llega al listado de libros.
 - [ ] Socios y Préstamos aparecen deshabilitados ("Próximamente") en el menú y en la portada.
-- [ ] Con el perfil de `Biblioteca.slnLaunch`, un solo F5 en Visual Studio arranca Api y Web.
+- [ ] Siguiendo los pasos de "Arranque", un perfil local de Visual Studio arranca Api y Web con un solo F5.
 
 **Libros**
 
@@ -159,9 +163,9 @@ formulario POST cuyo envío intercepta JavaScript para pedir la confirmación.
 8. **Mensajes de éxito:** con SweetAlert2, pasando el texto por `TempData`.
 9. **Portada y menú:** menú lateral colapsable con botón hamburguesa (Inicio, Libros, Socios,
    Préstamos); portada con bienvenida y cards de acceso directo. Se elimina `Privacy`.
-10. **Arrancar Api y Web juntas:** arranque múltiple de Visual Studio con un perfil guardado en
-    `Biblioteca.slnLaunch` (un solo F5 arranca las dos). Desde la terminal se sigue pudiendo
-    arrancar cada proyecto con `dotnet run`.
+10. **Arrancar Api y Web juntas:** arranque múltiple de Visual Studio, pero con un perfil local
+    de cada desarrollador (`.slnLaunch.user`, no se sube). Se descartó el `Biblioteca.slnLaunch`
+    compartido. Desde la terminal se sigue pudiendo arrancar cada proyecto con `dotnet run`.
 11. **Cómo se incluye SweetAlert2:** se copian sus archivos a `wwwroot/lib/sweetalert2`, como
     Bootstrap y jQuery (funciona sin internet, no es un paquete NuGet).
 12. **Socios y Préstamos en el menú y la portada:** se muestran deshabilitados con la etiqueta
