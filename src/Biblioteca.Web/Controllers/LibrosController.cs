@@ -17,6 +17,8 @@ public class LibrosController : Controller
     private const string MensajeLibroNoEncontrado = "El libro ya no existe. Puede que otra persona lo haya eliminado.";
     private const string MensajeApiNoDisponible =
         "No se pudo conectar con el servidor de la biblioteca (Api). Tus datos no se guardaron; inténtalo de nuevo.";
+    private const string MensajeApiNoDisponibleAlAbrir =
+        "No se pudo conectar con el servidor de la biblioteca (Api). Inténtalo de nuevo en un momento.";
 
     private readonly LibrosApiClient _librosApi;
 
@@ -61,11 +63,18 @@ public class LibrosController : Controller
         }
     }
 
-    // GET /Libros/Crear
+    // --- Crear y editar en modal (RW-09) ---------------------------------------------
+    // Estas acciones no devuelven páginas completas: site.js las llama con fetch y mira el
+    // código de respuesta para saber qué hacer:
+    //   200 → se guardó: recarga la página (el mensaje de éxito va en TempData).
+    //   400 → formulario con errores: lo pone otra vez en el modal.
+    //   404 / 503 → el libro no existe o la Api está caída: recarga la página (mensaje en TempData).
+
+    // GET /Libros/Crear → solo el formulario, para el modal.
     public IActionResult Crear()
     {
         // Se propone 1 ejemplar para que el formulario no empiece con un valor inválido (0).
-        return View(new CrearLibroDto { CantidadEjemplares = 1 });
+        return PartialView("_FormularioCrear", new CrearLibroDto { CantidadEjemplares = 1 });
     }
 
     // POST /Libros/Crear
@@ -76,7 +85,7 @@ public class LibrosController : Controller
         // Errores simples (campo vacío, ejemplares fuera de rango): no hace falta llamar a la Api.
         if (!ModelState.IsValid)
         {
-            return View(dto);
+            return FormularioConErrores("_FormularioCrear", dto);
         }
 
         RespuestaApi<LibroDto> respuesta = await _librosApi.CrearAsync(dto);
@@ -84,25 +93,25 @@ public class LibrosController : Controller
         {
             case EstadoRespuestaApi.Ok:
                 TempData[ClaveMensajeExito] = $"Se creó el libro \"{respuesta.Valor!.Titulo}\".";
-                return RedirectToAction(nameof(Index));
+                return Ok();
 
             case EstadoRespuestaApi.Invalido:
             case EstadoRespuestaApi.IsbnDuplicado:
-                // RW-03 y RW-04: se vuelve al formulario con lo escrito y el error junto a cada campo.
+                // RW-03 y RW-04: el modal sigue abierto con lo escrito y el error junto a cada campo.
                 CopiarErroresAModelState(respuesta.Errores);
-                return View(dto);
+                return FormularioConErrores("_FormularioCrear", dto);
 
             case EstadoRespuestaApi.ApiNoDisponible:
-                // RW-06: el mensaje sale arriba del formulario (validation summary).
+                // RW-06: el mensaje sale arriba del formulario (validation summary) y no se pierde lo escrito.
                 ModelState.AddModelError(string.Empty, MensajeApiNoDisponible);
-                return View(dto);
+                return FormularioConErrores("_FormularioCrear", dto);
 
             default:
                 throw new InvalidOperationException($"Estado no esperado: {respuesta.Estado}");
         }
     }
 
-    // GET /Libros/Editar/5
+    // GET /Libros/Editar/5 → solo el formulario con los datos actuales, para el modal.
     public async Task<IActionResult> Editar(int id)
     {
         RespuestaApi<LibroDto> respuesta = await _librosApi.ObtenerAsync(id);
@@ -118,14 +127,16 @@ public class LibrosController : Controller
                     AnioPublicacion = libro.AnioPublicacion,
                     CantidadEjemplares = libro.CantidadEjemplares
                 };
-                return View(dto);
+                return PartialView("_FormularioEditar", dto);
 
             case EstadoRespuestaApi.NoEncontrado:
+                // RW-05: site.js recarga la página y se ve este mensaje.
                 TempData[ClaveMensajeError] = MensajeLibroNoEncontrado;
-                return RedirectToAction(nameof(Index));
+                return NotFound();
 
             case EstadoRespuestaApi.ApiNoDisponible:
-                return View("ApiNoDisponible");
+                TempData[ClaveMensajeError] = MensajeApiNoDisponibleAlAbrir;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable);
 
             default:
                 throw new InvalidOperationException($"Estado no esperado: {respuesta.Estado}");
@@ -139,7 +150,7 @@ public class LibrosController : Controller
     {
         if (!ModelState.IsValid)
         {
-            return View(dto);
+            return FormularioConErrores("_FormularioEditar", dto);
         }
 
         RespuestaApi<LibroDto> respuesta = await _librosApi.ActualizarAsync(id, dto);
@@ -147,21 +158,21 @@ public class LibrosController : Controller
         {
             case EstadoRespuestaApi.Ok:
                 TempData[ClaveMensajeExito] = $"Se guardaron los cambios de \"{respuesta.Valor!.Titulo}\".";
-                return RedirectToAction(nameof(Index));
+                return Ok();
 
             case EstadoRespuestaApi.Invalido:
             case EstadoRespuestaApi.IsbnDuplicado:
                 CopiarErroresAModelState(respuesta.Errores);
-                return View(dto);
+                return FormularioConErrores("_FormularioEditar", dto);
 
             case EstadoRespuestaApi.NoEncontrado:
                 // RW-05: otro usuario lo borró mientras se editaba.
                 TempData[ClaveMensajeError] = MensajeLibroNoEncontrado;
-                return RedirectToAction(nameof(Index));
+                return NotFound();
 
             case EstadoRespuestaApi.ApiNoDisponible:
                 ModelState.AddModelError(string.Empty, MensajeApiNoDisponible);
-                return View(dto);
+                return FormularioConErrores("_FormularioEditar", dto);
 
             default:
                 throw new InvalidOperationException($"Estado no esperado: {respuesta.Estado}");
@@ -197,6 +208,14 @@ public class LibrosController : Controller
 
         // En todos los casos se vuelve al listado; el mensaje dice qué pasó.
         return RedirectToAction(nameof(Index));
+    }
+
+    // Devuelve el formulario con sus errores y código 400, para que site.js sepa que tiene que
+    // volver a ponerlo en el modal (en vez de recargar la página).
+    private PartialViewResult FormularioConErrores(string vistaFormulario, object dto)
+    {
+        Response.StatusCode = StatusCodes.Status400BadRequest;
+        return PartialView(vistaFormulario, dto);
     }
 
     // Las claves de los errores de la Api ("Titulo", "Isbn"...) coinciden con los nombres de los

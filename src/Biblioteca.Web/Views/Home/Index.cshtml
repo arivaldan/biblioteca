@@ -22,7 +22,8 @@
                 <i class="bi bi-journal-plus text-success"></i>
                 <h2 class="h5 card-title mt-2">Nuevo libro</h2>
                 <p class="card-text">Registra un libro en el catálogo.</p>
-                <a class="btn btn-success stretched-link" asp-controller="Libros" asp-action="Crear">Agregar libro</a>
+                @* "#nuevo" hace que el listado abra el modal de nuevo libro al cargar (ver site.js). *@
+                <a class="btn btn-success stretched-link" asp-controller="Libros" asp-action="Index" asp-fragment="nuevo">Agregar libro</a>
             </div>
         </div>
     </div>

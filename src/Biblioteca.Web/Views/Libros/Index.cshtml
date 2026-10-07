@@ -7,9 +7,10 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0">Libros</h1>
-    <a class="btn btn-success" asp-action="Crear">
+    @* Los botones con data-url-formulario abren el modal con ese formulario (ver site.js). *@
+    <button type="button" id="boton-nuevo-libro" class="btn btn-success" data-url-formulario="@Url.Action("Crear")">
         <i class="bi bi-plus-lg"></i> Nuevo libro
-    </a>
+    </button>
 </div>
 
 @if (apiNoDisponible)
@@ -47,9 +48,10 @@ else
                             <a class="btn btn-sm btn-outline-primary" asp-action="Detalle" asp-route-id="@libro.Id" title="Ver detalle">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a class="btn btn-sm btn-outline-secondary" asp-action="Editar" asp-route-id="@libro.Id" title="Editar">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Editar"
+                                    data-url-formulario="@Url.Action("Editar", new { id = libro.Id })">
                                 <i class="bi bi-pencil"></i>
-                            </a>
+                            </button>
                             @* site.js intercepta este formulario para pedir confirmación (RW-07). *@
                             <form asp-action="Eliminar" asp-route-id="@libro.Id" method="post"
                                   class="form-eliminar d-inline" data-titulo="@libro.Titulo">
@@ -63,4 +65,11 @@ else
             </tbody>
         </table>
     </div>
+}
+
+<partial name="_ModalFormulario" />
+
+@section Scripts {
+    @* Validación en el navegador del formulario del modal (decisión 4 de la spec). *@
+    <partial name="_ValidationScriptsPartial" />
 }

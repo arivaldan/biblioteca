@@ -8,7 +8,7 @@
 - Libro API completa: spec en `docs/specs/libro.md`, migración `Inicial` y tests.
 - Swagger UI en desarrollo (`/swagger`).
 - **Web MVC de Libro:** spec en `docs/specs/libro-web.md`.
-  - Listado, detalle, crear, editar y eliminar, consumiendo la Api con `LibrosApiClient`
+  - Listado, detalle, crear y editar (en modal) y eliminar, consumiendo la Api con `LibrosApiClient`
     (`HttpClient` tipado).
   - Menú lateral colapsable y portada con cards. Socios y Préstamos aparecen como
     "Próximamente".
@@ -21,6 +21,8 @@
 - Prueba manual en el navegador de lo que solo se ve con JavaScript: diálogo de confirmación
   al eliminar (también cancelar), mensajes de éxito/error y menú hamburguesa. El resto se
   probó con la Api y la Web arrancadas.
+- Prueba en el navegador de los modales de crear y editar: abrir, errores dentro del modal,
+  guardar y recargar, y el card "Nuevo libro" de la portada (`/Libros#nuevo`).
 
 ## Próximas fases (en orden)
 

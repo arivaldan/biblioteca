@@ -64,3 +64,88 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+// --- Modal de crear y editar (RW-09) ------------------------------------------
+// Los botones con data-url-formulario piden ese formulario al servidor y lo muestran en el
+// modal de _ModalFormulario.cshtml. El formulario se envía con fetch para que, si hay errores,
+// se vean dentro del modal sin cerrarlo. Qué significa cada respuesta: ver LibrosController.
+document.addEventListener("DOMContentLoaded", function () {
+    const modalElemento = document.getElementById("modal-formulario");
+    if (!modalElemento) {
+        return; // Esta página no tiene modal.
+    }
+    const contenido = document.getElementById("modal-formulario-contenido");
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
+
+    function mostrarFormulario(html) {
+        contenido.innerHTML = html;
+        // La validación en el navegador solo conoce los formularios que había al cargar la
+        // página: hay que avisarle del nuevo. (jQuery Validation es la única parte con jQuery.)
+        $.validator.unobtrusive.parse(contenido.querySelector("form"));
+    }
+
+    function avisarErrorInesperado() {
+        Swal.fire({ icon: "error", title: "Ocurrió un error inesperado", text: "Inténtalo de nuevo en un momento." });
+    }
+
+    async function abrirFormulario(url) {
+        try {
+            const respuesta = await fetch(url);
+            if (respuesta.ok) {
+                mostrarFormulario(await respuesta.text());
+                modal.show();
+            } else {
+                // 404 o 503: el controller dejó el mensaje en TempData y al recargar se ve.
+                window.location.reload();
+            }
+        } catch {
+            avisarErrorInesperado(); // La propia Web no respondió.
+        }
+    }
+
+    document.querySelectorAll("[data-url-formulario]").forEach(function (boton) {
+        boton.addEventListener("click", function () {
+            abrirFormulario(boton.dataset.urlFormulario);
+        });
+    });
+
+    // Se escucha el "submit" en el contenido del modal (y no en el formulario) porque el
+    // formulario se reemplaza cada vez que llega uno nuevo del servidor.
+    contenido.addEventListener("submit", async function (evento) {
+        evento.preventDefault(); // Se envía con fetch, no recargando la página.
+        const formulario = evento.target;
+        if (!$(formulario).valid()) {
+            return; // Hay errores simples: jQuery Validation ya los está mostrando.
+        }
+
+        const botonGuardar = formulario.querySelector("button[type=submit]");
+        botonGuardar.disabled = true; // Evita guardar dos veces con un doble clic.
+
+        try {
+            // FormData incluye todos los campos, también el token antiforgery.
+            const respuesta = await fetch(formulario.action, { method: "POST", body: new FormData(formulario) });
+
+            if (respuesta.status === 400) {
+                mostrarFormulario(await respuesta.text()); // Formulario con errores.
+            } else if (respuesta.ok || respuesta.status === 404 || respuesta.status === 503) {
+                window.location.reload(); // Guardado, o libro borrado: el mensaje va en TempData.
+            } else {
+                botonGuardar.disabled = false;
+                avisarErrorInesperado();
+            }
+        } catch {
+            botonGuardar.disabled = false;
+            avisarErrorInesperado();
+        }
+    });
+
+    // El card "Nuevo libro" de la portada lleva a /Libros#nuevo: se abre el modal al cargar.
+    // Se quita "#nuevo" de la dirección para que al recargar (tras guardar) no se abra otra vez.
+    if (window.location.hash === "#nuevo") {
+        history.replaceState(null, "", window.location.pathname);
+        const botonNuevo = document.getElementById("boton-nuevo-libro");
+        if (botonNuevo) {
+            botonNuevo.click();
+        }
+    }
+});

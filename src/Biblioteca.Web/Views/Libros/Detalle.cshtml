@@ -7,9 +7,11 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0">@Model.Titulo</h1>
     <div class="text-nowrap">
-        <a class="btn btn-outline-secondary" asp-action="Editar" asp-route-id="@Model.Id">
+        @* Abre el modal de edición (ver site.js); al guardar se recarga este detalle. *@
+        <button type="button" class="btn btn-outline-secondary"
+                data-url-formulario="@Url.Action("Editar", new { id = Model.Id })">
             <i class="bi bi-pencil"></i> Editar
-        </a>
+        </button>
         @* site.js intercepta este formulario para pedir confirmación (RW-07). *@
         <form asp-action="Eliminar" asp-route-id="@Model.Id" method="post"
               class="form-eliminar d-inline" data-titulo="@Model.Titulo">
@@ -50,3 +52,9 @@
         Disponible cuando se implementen los préstamos.
     </div>
 </div>
+
+<partial name="_ModalFormulario" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
