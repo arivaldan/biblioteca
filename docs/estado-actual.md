@@ -7,6 +7,7 @@
 - Estructura de la solución, `CLAUDE.md` y `.claude/settings.json`.
 - Libro API completa: spec en `docs/specs/libro.md`, migración `Inicial` y tests.
 - Swagger UI en desarrollo (`/swagger`).
+- `README.md` y guía de instalación paso a paso (`docs/guia-instalacion.md`).
 - **Web MVC de Libro:** spec en `docs/specs/libro-web.md`.
   - Listado, detalle, crear y editar (en modal) y eliminar, consumiendo la Api con `LibrosApiClient`
     (`HttpClient` tipado).
@@ -34,8 +35,8 @@
 2. **Préstamo:** máximo 3 préstamos por socio, control de stock y devoluciones. Resolver las
    preguntas diferidas 14 y 15 de la spec de Libro. Completar el "Historial de préstamos" del
    detalle de libro.
-3. **Cierre para el traspaso:** `README`, `setup.ps1`, subagente revisor de código y hook de
-   `dotnet format`.
+3. **Cierre para el traspaso:** `setup.ps1` (automatizar los pasos de
+   `docs/guia-instalacion.md`), subagente revisor de código y hook de `dotnet format`.
 
 ## Flujo de trabajo
 
