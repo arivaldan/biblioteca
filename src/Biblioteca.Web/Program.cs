@@ -3,7 +3,20 @@ using Biblioteca.Web.ApiClients;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(opciones =>
+{
+    // Mensajes que da ASP.NET Core cuando un valor del formulario no se puede convertir (por
+    // ejemplo, "abc" en un campo numérico). Por defecto están en inglés. No nombran el campo
+    // porque el mensaje ya aparece junto a él.
+    opciones.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(
+        valor => "Este campo es obligatorio.");
+    opciones.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor(
+        (valor, campo) => $"El valor '{valor}' no es válido.");
+    opciones.ModelBindingMessageProvider.SetValueIsInvalidAccessor(
+        valor => "El valor no es válido.");
+    opciones.ModelBindingMessageProvider.SetValueMustBeANumberAccessor(
+        campo => "Debe ser un número.");
+});
 
 // Dirección de la Api (RW-02). Está en appsettings.json para poder cambiarla sin tocar código.
 // Termina en "/" para que las rutas relativas del cliente ("api/libros") se sumen bien.

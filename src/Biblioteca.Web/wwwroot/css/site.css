@@ -72,3 +72,9 @@ html {
 .card-acceso.deshabilitado {
   opacity: 0.6;
 }
+
+/* --- Formularios --------------------------------------------------------- */
+
+.formulario {
+  max-width: 40rem;
+}
