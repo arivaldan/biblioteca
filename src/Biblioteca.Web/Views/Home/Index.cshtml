@@ -1,8 +1,51 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h1 class="mb-2">Bienvenido a la Biblioteca</h1>
+<p class="lead mb-4">Gestiona el catálogo de libros, los socios y los préstamos desde un solo lugar.</p>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+    <div class="col">
+        <div class="card card-acceso h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-journal-bookmark text-primary"></i>
+                <h2 class="h5 card-title mt-2">Ver libros</h2>
+                <p class="card-text">Consulta el catálogo completo.</p>
+                <a class="btn btn-primary stretched-link" asp-controller="Libros" asp-action="Index">Ir a libros</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card card-acceso h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-journal-plus text-success"></i>
+                <h2 class="h5 card-title mt-2">Nuevo libro</h2>
+                <p class="card-text">Registra un libro en el catálogo.</p>
+                @* "#nuevo" hace que el listado abra el modal de nuevo libro al cargar (ver site.js). *@
+                <a class="btn btn-success stretched-link" asp-controller="Libros" asp-action="Index" asp-fragment="nuevo">Agregar libro</a>
+            </div>
+        </div>
+    </div>
+    @* Socios y Préstamos todavía no existen: cards deshabilitados. *@
+    <div class="col">
+        <div class="card card-acceso deshabilitado h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-people text-secondary"></i>
+                <h2 class="h5 card-title mt-2">Socios</h2>
+                <p class="card-text">Alta y consulta de socios.</p>
+                <span class="badge text-bg-secondary">Próximamente</span>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card card-acceso deshabilitado h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-arrow-left-right text-secondary"></i>
+                <h2 class="h5 card-title mt-2">Préstamos</h2>
+                <p class="card-text">Préstamos y devoluciones.</p>
+                <span class="badge text-bg-secondary">Próximamente</span>
+            </div>
+        </div>
+    </div>
 </div>

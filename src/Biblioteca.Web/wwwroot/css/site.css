@@ -12,20 +12,64 @@ html {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+/* --- Menú lateral ------------------------------------------------------- */
+
+.menu-lateral {
+  width: 230px;
+  min-height: 100vh;
+  flex-shrink: 0;
+  padding: 1rem 0.75rem;
 }
 
-body {
-  margin-bottom: 60px;
+/* El botón hamburguesa agrega o quita esta clase (ver site.js). */
+.menu-lateral.colapsado {
+  display: none;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.menu-lateral-marca {
+  display: block;
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+  font-size: 1.25rem;
+  color: #fff;
+  text-decoration: none;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.menu-lateral .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 0.375rem;
 }
+
+.menu-lateral .nav-link:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu-lateral .nav-link.active {
+  color: #fff;
+  background-color: #1b6ec2;
+}
+
+.menu-lateral .nav-link.disabled {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.menu-lateral .bi {
+  margin-right: 0.5rem;
+}
+
+.barra-superior {
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+}
+
+/* --- Portada ------------------------------------------------------------- */
+
+.card-acceso .bi {
+  font-size: 2.5rem;
+}
+
+.card-acceso.deshabilitado {
+  opacity: 0.6;
+}
+
