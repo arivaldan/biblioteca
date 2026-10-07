@@ -58,6 +58,14 @@
             <main role="main" class="container-fluid py-3">
                 @RenderBody()
             </main>
+
+            @*
+                Mensajes que deja un controller en TempData antes de redirigir (RW-08).
+                Van en atributos data- (Razor los codifica) y site.js los muestra con SweetAlert2.
+            *@
+            <div id="mensajes" hidden
+                 data-exito="@TempData["MensajeExito"]"
+                 data-error="@TempData["MensajeError"]"></div>
         </div>
     </div>
 

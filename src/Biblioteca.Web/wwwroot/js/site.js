@@ -20,3 +20,17 @@ document.addEventListener("DOMContentLoaded", function () {
         colapsarMenu(!menu.classList.contains("colapsado"));
     });
 });
+
+// --- Mensajes de éxito y error (ver el div "mensajes" en _Layout.cshtml) ----------
+document.addEventListener("DOMContentLoaded", function () {
+    const mensajes = document.getElementById("mensajes");
+    const exito = mensajes.dataset.exito;
+    const error = mensajes.dataset.error;
+
+    // Se usa "text" y no "html" para que SweetAlert2 no interprete etiquetas del mensaje.
+    if (exito) {
+        Swal.fire({ icon: "success", title: "Listo", text: exito, timer: 2500, showConfirmButton: false });
+    } else if (error) {
+        Swal.fire({ icon: "error", title: "No se pudo completar", text: error });
+    }
+});

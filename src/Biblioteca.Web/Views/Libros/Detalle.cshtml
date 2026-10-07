@@ -1,0 +1,45 @@
+@using Biblioteca.Contracts.Libros
+@model LibroDto
+@{
+    ViewData["Title"] = Model.Titulo;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">@Model.Titulo</h1>
+    <div class="text-nowrap">
+        <a class="btn btn-outline-secondary" asp-action="Editar" asp-route-id="@Model.Id">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+        <a class="btn btn-outline-primary" asp-action="Index">
+            <i class="bi bi-arrow-left"></i> Volver al listado
+        </a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Autor</dt>
+            <dd class="col-sm-9">@Model.Autor</dd>
+
+            <dt class="col-sm-3">ISBN</dt>
+            <dd class="col-sm-9">@Model.Isbn</dd>
+
+            <dt class="col-sm-3">Año de publicación</dt>
+            <dd class="col-sm-9">@(Model.AnioPublicacion?.ToString() ?? "—")</dd>
+
+            <dt class="col-sm-3">Ejemplares</dt>
+            <dd class="col-sm-9">@Model.CantidadEjemplares</dd>
+        </dl>
+    </div>
+</div>
+
+@* Se completará en la spec de Préstamo: a quién se prestó el libro y cuándo. *@
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-clock-history"></i> Historial de préstamos
+    </div>
+    <div class="card-body text-muted">
+        Disponible cuando se implementen los préstamos.
+    </div>
+</div>
