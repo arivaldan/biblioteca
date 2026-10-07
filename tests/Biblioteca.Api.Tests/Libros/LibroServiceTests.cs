@@ -324,6 +324,141 @@ public class LibroServiceTests
         Assert.Equal(EstadoResultado.Ok, resultado.Estado);
     }
 
+    // --- Actualizar -----------------------------------------------------------
+
+    [Fact]
+    public async Task Actualizar_LibroValido_ActualizaTodosLosCampos()
+    {
+        using var bd = new BaseDeDatosEnMemoria();
+        Libro existente = CrearLibro("Rayuela", "9788437604947");
+        await GuardarLibrosAsync(bd, existente);
+        LibroService servicio = CrearServicio(bd);
+        var dto = new ActualizarLibroDto
+        {
+            Titulo = "  Ficciones ",
+            Autor = " Jorge Luis Borges ",
+            Isbn = "978-84-206-3328-3",
+            AnioPublicacion = 1944,
+            CantidadEjemplares = 5
+        };
+
+        Resultado<LibroDto> resultado = await servicio.ActualizarAsync(existente.Id, dto);
+
+        Assert.Equal(EstadoResultado.Ok, resultado.Estado);
+        Assert.Equal(existente.Id, resultado.Valor?.Id);
+        Libro guardado = await LeerUnicoLibroAsync(bd);
+        Assert.Equal("Ficciones", guardado.Titulo);
+        Assert.Equal("Jorge Luis Borges", guardado.Autor);
+        Assert.Equal("9788420633283", guardado.Isbn);
+        Assert.Equal(1944, guardado.AnioPublicacion);
+        Assert.Equal(5, guardado.CantidadEjemplares);
+    }
+
+    [Fact]
+    public async Task Actualizar_IdInexistente_DevuelveNoEncontrado()
+    {
+        using var bd = new BaseDeDatosEnMemoria();
+        LibroService servicio = CrearServicio(bd);
+
+        Resultado<LibroDto> resultado = await servicio.ActualizarAsync(999, CrearDtoActualizar("9788437604947"));
+
+        Assert.Equal(EstadoResultado.NoEncontrado, resultado.Estado);
+    }
+
+    // Las reglas de validación son las mismas que al crear (método Validar compartido);
+    // basta un test para confirmar que Actualizar también las aplica.
+    [Fact]
+    public async Task Actualizar_DatosInvalidos_EsInvalidoYNoCambiaNada()
+    {
+        using var bd = new BaseDeDatosEnMemoria();
+        Libro existente = CrearLibro("Rayuela", "9788437604947");
+        await GuardarLibrosAsync(bd, existente);
+        LibroService servicio = CrearServicio(bd);
+        ActualizarLibroDto dto = CrearDtoActualizar("123");
+        dto.Titulo = "   ";
+
+        Resultado<LibroDto> resultado = await servicio.ActualizarAsync(existente.Id, dto);
+
+        AssertInvalidoEnCampo(resultado, "Titulo");
+        AssertInvalidoEnCampo(resultado, "Isbn");
+        Libro guardado = await LeerUnicoLibroAsync(bd);
+        Assert.Equal("Rayuela", guardado.Titulo);
+    }
+
+    // RN-04
+    [Fact]
+    public async Task Actualizar_IsbnDeOtroLibro_DevuelveIsbnDuplicado()
+    {
+        using var bd = new BaseDeDatosEnMemoria();
+        Libro aActualizar = CrearLibro("Rayuela", "9788437604947");
+        Libro otro = CrearLibro("Ficciones", "080442957X");
+        await GuardarLibrosAsync(bd, aActualizar, otro);
+        LibroService servicio = CrearServicio(bd);
+
+        Resultado<LibroDto> resultado = await servicio.ActualizarAsync(aActualizar.Id, CrearDtoActualizar("0-8044-2957-x"));
+
+        Assert.Equal(EstadoResultado.IsbnDuplicado, resultado.Estado);
+    }
+
+    // RN-04: conservar el propio ISBN no es un duplicado (aunque venga escrito con guiones).
+    [Fact]
+    public async Task Actualizar_MismoIsbn_EsOk()
+    {
+        using var bd = new BaseDeDatosEnMemoria();
+        Libro existente = CrearLibro("Rayuela", "9788437604947");
+        await GuardarLibrosAsync(bd, existente);
+        LibroService servicio = CrearServicio(bd);
+
+        Resultado<LibroDto> resultado = await servicio.ActualizarAsync(existente.Id, CrearDtoActualizar("978-84-376-0494-7"));
+
+        Assert.Equal(EstadoResultado.Ok, resultado.Estado);
+    }
+
+    // RN-09 (+ RN-07)
+    [Fact]
+    public async Task Actualizar_IsbnNuevoLibre_SeGuardaNormalizado()
+    {
+        using var bd = new BaseDeDatosEnMemoria();
+        Libro existente = CrearLibro("Rayuela", "9788437604947");
+        await GuardarLibrosAsync(bd, existente);
+        LibroService servicio = CrearServicio(bd);
+
+        Resultado<LibroDto> resultado = await servicio.ActualizarAsync(existente.Id, CrearDtoActualizar("84 376 0494 7"));
+
+        Assert.Equal(EstadoResultado.Ok, resultado.Estado);
+        Libro guardado = await LeerUnicoLibroAsync(bd);
+        Assert.Equal("8437604947", guardado.Isbn);
+    }
+
+    // --- Eliminar -------------------------------------------------------------
+
+    [Fact]
+    public async Task Eliminar_Existente_LoBorraDeLaBase()
+    {
+        using var bd = new BaseDeDatosEnMemoria();
+        Libro aEliminar = CrearLibro("Rayuela", "9788437604947");
+        Libro otro = CrearLibro("Ficciones", "080442957X");
+        await GuardarLibrosAsync(bd, aEliminar, otro);
+        LibroService servicio = CrearServicio(bd);
+
+        Resultado<LibroDto> resultado = await servicio.EliminarAsync(aEliminar.Id);
+
+        Assert.Equal(EstadoResultado.Ok, resultado.Estado);
+        Libro queda = await LeerUnicoLibroAsync(bd);
+        Assert.Equal("Ficciones", queda.Titulo);
+    }
+
+    [Fact]
+    public async Task Eliminar_IdInexistente_DevuelveNoEncontrado()
+    {
+        using var bd = new BaseDeDatosEnMemoria();
+        LibroService servicio = CrearServicio(bd);
+
+        Resultado<LibroDto> resultado = await servicio.EliminarAsync(999);
+
+        Assert.Equal(EstadoResultado.NoEncontrado, resultado.Estado);
+    }
+
     // --- Ayudas ---------------------------------------------------------------
 
     // El reloj de los tests siempre marca una fecha de este año.
@@ -345,6 +480,18 @@ public class LibroServiceTests
             Titulo = "Rayuela",
             Autor = "Julio Cortázar",
             Isbn = "9788437604947",
+            AnioPublicacion = 1963,
+            CantidadEjemplares = 2
+        };
+    }
+
+    private static ActualizarLibroDto CrearDtoActualizar(string isbn)
+    {
+        return new ActualizarLibroDto
+        {
+            Titulo = "Rayuela",
+            Autor = "Julio Cortázar",
+            Isbn = isbn,
             AnioPublicacion = 1963,
             CantidadEjemplares = 2
         };

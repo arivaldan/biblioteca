@@ -98,6 +98,66 @@ public class LibroService
     }
 
     /// <summary>
+    /// Actualiza todos los campos del libro con ese id. Devuelve Invalido (400),
+    /// NoEncontrado (404), IsbnDuplicado (409) u Ok con el libro actualizado.
+    /// </summary>
+    public async Task<Resultado<LibroDto>> ActualizarAsync(int id, ActualizarLibroDto dto)
+    {
+        // Mismo orden que al crear: limpiar, validar y después ir a la base.
+        string titulo = dto.Titulo.Trim();
+        string autor = dto.Autor.Trim();
+        string isbn = Isbn.Normalizar(dto.Isbn);
+
+        Dictionary<string, string[]> errores = Validar(titulo, autor, isbn, dto.AnioPublicacion);
+        if (errores.Count > 0)
+        {
+            return Resultado<LibroDto>.Invalido(errores);
+        }
+
+        // Aquí sí queremos tracking (FindAsync): EF detecta los cambios y genera el UPDATE.
+        Libro? libro = await _contexto.Libros.FindAsync(id);
+        if (libro == null)
+        {
+            return Resultado<LibroDto>.NoEncontrado();
+        }
+
+        // RN-04 y RN-09: el ISBN se puede cambiar, pero no a uno que ya tenga OTRO libro.
+        // Se excluye el propio libro para que pueda conservar su ISBN.
+        bool isbnLoTieneOtroLibro = await _contexto.Libros.AnyAsync(l => l.Isbn == isbn && l.Id != id);
+        if (isbnLoTieneOtroLibro)
+        {
+            return Resultado<LibroDto>.IsbnDuplicado();
+        }
+
+        libro.Titulo = titulo;
+        libro.Autor = autor;
+        libro.Isbn = isbn;
+        libro.AnioPublicacion = dto.AnioPublicacion;
+        libro.CantidadEjemplares = dto.CantidadEjemplares;
+        await _contexto.SaveChangesAsync();
+
+        return Resultado<LibroDto>.Ok(ADto(libro));
+    }
+
+    /// <summary>
+    /// Borra el libro de la base (borrado físico, ver "Preguntas abiertas" de la spec).
+    /// Devuelve NoEncontrado (404) u Ok con el libro que se eliminó.
+    /// </summary>
+    public async Task<Resultado<LibroDto>> EliminarAsync(int id)
+    {
+        Libro? libro = await _contexto.Libros.FindAsync(id);
+        if (libro == null)
+        {
+            return Resultado<LibroDto>.NoEncontrado();
+        }
+
+        _contexto.Libros.Remove(libro);
+        await _contexto.SaveChangesAsync();
+
+        return Resultado<LibroDto>.Ok(ADto(libro));
+    }
+
+    /// <summary>
     /// Reglas que necesitan el valor ya limpio o el reloj. Lo "obligatorio" y RN-06 los
     /// revisan los DataAnnotations del DTO antes de llegar aquí.
     /// Devuelve los errores por campo; si está vacío, todo es válido.
