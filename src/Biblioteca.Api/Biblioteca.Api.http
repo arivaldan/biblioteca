@@ -1,3 +1,64 @@
 @Biblioteca.Api_HostAddress = http://localhost:5211
 
-### Agrega aquí las peticiones de prueba de tus endpoints.
+# Peticiones para probar a mano el CRUD de libros (docs/specs/libro.md).
+# Ejecutar en orden: la creación guarda el id en {{crear.response.body.$.id}}.
+
+### Listar libros (200, ordenados por título)
+GET {{Biblioteca.Api_HostAddress}}/api/libros
+
+### Crear libro (201 + cabecera Location). El ISBN se guarda sin guiones (RN-07).
+# @name crear
+POST {{Biblioteca.Api_HostAddress}}/api/libros
+Content-Type: application/json
+
+{
+  "titulo": "  Rayuela  ",
+  "autor": "Julio Cortázar",
+  "isbn": "978-84-376-0494-7",
+  "anioPublicacion": 1963,
+  "cantidadEjemplares": 3
+}
+
+### Obtener el libro creado (200)
+GET {{Biblioteca.Api_HostAddress}}/api/libros/{{crear.response.body.$.id}}
+
+### Crear con el mismo ISBN (409 ProblemDetails, RN-04)
+POST {{Biblioteca.Api_HostAddress}}/api/libros
+Content-Type: application/json
+
+{
+  "titulo": "Otro título",
+  "autor": "Otro autor",
+  "isbn": "9788437604947",
+  "cantidadEjemplares": 1
+}
+
+### Crear con datos inválidos (400 ProblemDetails con varios campos)
+POST {{Biblioteca.Api_HostAddress}}/api/libros
+Content-Type: application/json
+
+{
+  "titulo": "   ",
+  "autor": "Alguien",
+  "isbn": "123",
+  "anioPublicacion": 3000,
+  "cantidadEjemplares": 0
+}
+
+### Actualizar el libro creado (200 con el libro actualizado)
+PUT {{Biblioteca.Api_HostAddress}}/api/libros/{{crear.response.body.$.id}}
+Content-Type: application/json
+
+{
+  "titulo": "Rayuela (edición revisada)",
+  "autor": "Julio Cortázar",
+  "isbn": "84-376-0494-7",
+  "anioPublicacion": 1963,
+  "cantidadEjemplares": 5
+}
+
+### Obtener un id que no existe (404 ProblemDetails)
+GET {{Biblioteca.Api_HostAddress}}/api/libros/999999
+
+### Eliminar el libro creado (204)
+DELETE {{Biblioteca.Api_HostAddress}}/api/libros/{{crear.response.body.$.id}}
