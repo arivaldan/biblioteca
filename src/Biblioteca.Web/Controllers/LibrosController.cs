@@ -168,6 +168,37 @@ public class LibrosController : Controller
         }
     }
 
+    // POST /Libros/Eliminar/5
+    // No hay página de confirmación: la pide site.js con SweetAlert2 antes de enviar el
+    // formulario (RW-07). Si el usuario cancela, esta acción ni se llama.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Eliminar(int id)
+    {
+        RespuestaApi<LibroDto> respuesta = await _librosApi.EliminarAsync(id);
+        switch (respuesta.Estado)
+        {
+            case EstadoRespuestaApi.Ok:
+                TempData[ClaveMensajeExito] = "El libro se eliminó correctamente.";
+                break;
+
+            case EstadoRespuestaApi.NoEncontrado:
+                TempData[ClaveMensajeError] = MensajeLibroNoEncontrado;
+                break;
+
+            case EstadoRespuestaApi.ApiNoDisponible:
+                TempData[ClaveMensajeError] =
+                    "No se pudo conectar con el servidor de la biblioteca (Api). El libro no se eliminó.";
+                break;
+
+            default:
+                throw new InvalidOperationException($"Estado no esperado: {respuesta.Estado}");
+        }
+
+        // En todos los casos se vuelve al listado; el mensaje dice qué pasó.
+        return RedirectToAction(nameof(Index));
+    }
+
     // Las claves de los errores de la Api ("Titulo", "Isbn"...) coinciden con los nombres de los
     // campos del formulario, así cada mensaje aparece junto a su campo.
     private void CopiarErroresAModelState(Dictionary<string, string[]> errores)

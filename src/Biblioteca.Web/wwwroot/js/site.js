@@ -34,3 +34,33 @@ document.addEventListener("DOMContentLoaded", function () {
         Swal.fire({ icon: "error", title: "No se pudo completar", text: error });
     }
 });
+
+// --- Confirmación antes de eliminar (RW-07) -----------------------------------
+// Los formularios con la clase "form-eliminar" no se envían directamente: primero se pregunta
+// con SweetAlert2 y solo se envían si el usuario confirma.
+document.addEventListener("DOMContentLoaded", function () {
+    const formularios = document.querySelectorAll("form.form-eliminar");
+
+    formularios.forEach(function (formulario) {
+        formulario.addEventListener("submit", function (evento) {
+            // Se detiene el envío mientras el usuario decide.
+            evento.preventDefault();
+
+            Swal.fire({
+                icon: "warning",
+                title: "¿Eliminar este libro?",
+                text: "Se eliminará \"" + formulario.dataset.titulo + "\". Esta acción no se puede deshacer.",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar",
+                confirmButtonColor: "#dc3545",
+                focusCancel: true // Si se pulsa Enter sin pensar, se cancela.
+            }).then(function (resultado) {
+                if (resultado.isConfirmed) {
+                    // submit() no vuelve a lanzar el evento "submit", así que no se pregunta dos veces.
+                    formulario.submit();
+                }
+            });
+        });
+    });
+});
