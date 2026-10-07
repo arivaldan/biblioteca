@@ -27,8 +27,8 @@ La Web no tiene modelo propio ni base de datos. Usa los DTOs de `Biblioteca.Cont
 | DTO                  | Uso en la Web                       |
 |----------------------|-------------------------------------|
 | `LibroDto`           | Listado y detalle                   |
-| `CrearLibroDto`      | Formulario de alta                  |
-| `ActualizarLibroDto` | Formulario de edición               |
+| `CrearLibroDto`      | Formulario de alta (modal)          |
+| `ActualizarLibroDto` | Formulario de edición (modal)       |
 
 Los campos y sus validaciones son los de `libro.md`. La Web **no** repite las reglas de
 negocio (trim, ISBN, año, duplicados): las valida la API y la Web muestra el resultado.
@@ -40,18 +40,22 @@ Se usa el prefijo `RW` para no confundirlas con las reglas de negocio `RN` de `l
 1. **RW-01** — La Web nunca accede a la base de datos ni referencia EF Core. Todo pasa por
    el `HttpClient` tipado (`LibrosApiClient`).
 2. **RW-02** — La URL base de la API se configura en `appsettings` (no hardcodeada en código).
-3. **RW-03** — Si la API responde **400**, el formulario se vuelve a mostrar con los datos que
-   escribió el usuario y cada error junto al campo que indica la API.
-4. **RW-04** — Si la API responde **409** (ISBN duplicado), el formulario se vuelve a mostrar
-   con los datos del usuario y el mensaje de la API junto al campo ISBN.
+3. **RW-03** — Si la API responde **400**, el formulario sigue abierto en el modal con los datos
+   que escribió el usuario y cada error junto al campo que indica la API.
+4. **RW-04** — Si la API responde **409** (ISBN duplicado), el formulario sigue abierto en el
+   modal con los datos del usuario y el mensaje de la API junto al campo ISBN.
 5. **RW-05** — Si la API responde **404** al ver, editar o eliminar un libro (por ejemplo, otro
    usuario ya lo borró), se vuelve al listado con un mensaje de error.
 6. **RW-06** — Si la API no está disponible, se muestra un mensaje entendible dentro de la
    misma pantalla, en vez de una excepción.
 7. **RW-07** — Antes de eliminar, el usuario confirma en un diálogo JavaScript (SweetAlert2).
    Si cancela, no se envía nada a la API.
-8. **RW-08** — Tras crear, editar o eliminar con éxito se vuelve al listado y se muestra un
-   mensaje de éxito con SweetAlert2. El mensaje viaja en `TempData` (patrón Post-Redirect-Get).
+8. **RW-08** — Tras crear, editar o eliminar con éxito se muestra un mensaje de éxito con
+   SweetAlert2. El mensaje viaja en `TempData`. Al eliminar se vuelve al listado; al crear o
+   editar desde el modal se recarga la página donde estaba el usuario (listado o detalle).
+9. **RW-09** — Crear y editar se hacen en un **modal** (Bootstrap) que se abre sobre la página
+   actual, sin páginas propias. El formulario se pide al servidor y se envía con `fetch`, así la
+   validación y los errores de la API se muestran dentro del modal sin cerrarlo.
 
 ## Pantallas (rutas MVC)
 
@@ -60,14 +64,27 @@ Se usa el prefijo `RW` para no confundirlas con las reglas de negocio `RN` de `l
 | GET    | /                        | Portada: bienvenida y cards de acceso directo  | —                       |
 | GET    | /Libros                  | Listado ordenado por título (lo ordena la API) | GET /api/libros         |
 | GET    | /Libros/Detalle/{id}     | Datos del libro + sección "Historial de préstamos" vacía | GET /api/libros/{id} |
-| GET    | /Libros/Crear            | Formulario vacío                               | —                       |
-| POST   | /Libros/Crear            | Envía el alta                                  | POST /api/libros        |
-| GET    | /Libros/Editar/{id}      | Formulario con los datos actuales              | GET /api/libros/{id}    |
-| POST   | /Libros/Editar/{id}      | Envía la edición                               | PUT /api/libros/{id}    |
+| GET    | /Libros/Crear            | Solo el formulario vacío (para el modal)       | —                       |
+| POST   | /Libros/Crear            | Envía el alta (con `fetch`)                    | POST /api/libros        |
+| GET    | /Libros/Editar/{id}      | Solo el formulario con los datos (para el modal) | GET /api/libros/{id}  |
+| POST   | /Libros/Editar/{id}      | Envía la edición (con `fetch`)                 | PUT /api/libros/{id}    |
 | POST   | /Libros/Eliminar/{id}    | Borra el libro (tras confirmar con SweetAlert2) | DELETE /api/libros/{id} |
 
 Los POST usan token antiforgery. El botón "Eliminar" está en el listado y en el detalle; es un
 formulario POST cuyo envío intercepta JavaScript para pedir la confirmación.
+
+### Modal de crear y editar
+
+- "Nuevo libro" está en el listado; "Editar" está en el listado y en el detalle.
+- El card "Nuevo libro" de la portada lleva al listado y abre el modal automáticamente.
+- Las rutas `GET /Libros/Crear` y `GET /Libros/Editar/{id}` devuelven solo el formulario (vista
+  parcial), no una página completa.
+- Respuestas del POST que interpreta JavaScript:
+  - **200**: se guardó; se recarga la página y se ve el mensaje de éxito.
+  - **400**: formulario con errores; se reemplaza el contenido del modal.
+  - **404 / 503** (libro borrado o Api caída al abrir el modal o al guardar un libro borrado):
+    se recarga la página y se ve el mensaje guardado en `TempData`.
+  - Si la Api está caída al guardar, el formulario sigue abierto con el error arriba (RW-06).
 
 ### Estructura general (layout)
 
@@ -104,13 +121,17 @@ formulario POST cuyo envío intercepta JavaScript para pedir la confirmación.
 - [ ] El listado muestra todos los libros con título, autor, ISBN, año y ejemplares.
 - [ ] Con la API sin libros, el listado muestra "No hay libros registrados".
 - [ ] El detalle muestra todos los datos del libro y la sección de historial de préstamos vacía.
-- [ ] Se puede crear un libro válido, aparece en el listado y se ve el mensaje de éxito.
+- [ ] "Nuevo libro" abre un modal; al guardar un libro válido el modal se cierra, el libro
+      aparece en el listado y se ve el mensaje de éxito.
+- [ ] El card "Nuevo libro" de la portada abre el listado con el modal ya abierto.
 - [ ] Un campo vacío se marca en el navegador antes de enviar (validación cliente).
 - [ ] Crear un libro con un dato que rechaza la API (ej. ISBN con formato inválido) muestra el
       error junto al campo y conserva lo escrito.
 - [ ] Crear un libro con un ISBN ya registrado muestra el error junto al campo ISBN y conserva
       lo escrito.
-- [ ] Se puede editar un libro, el cambio se ve en el listado y se ve el mensaje de éxito.
+- [ ] "Editar" abre un modal con los datos actuales; al guardar se recarga la página donde
+      estaba (listado o detalle) con el cambio y el mensaje de éxito.
+- [ ] Con errores (de validación o de la Api), el modal sigue abierto y conserva lo escrito.
 - [ ] Editar usando el ISBN de otro libro muestra el error de ISBN duplicado.
 - [ ] Al pulsar "Eliminar" aparece la confirmación; si se cancela, el libro sigue; si se
       confirma, desaparece del listado y se ve el mensaje de éxito.
@@ -146,6 +167,9 @@ formulario POST cuyo envío intercepta JavaScript para pedir la confirmación.
 12. **Socios y Préstamos en el menú y la portada:** se muestran deshabilitados con la etiqueta
     "Próximamente" hasta que se implementen.
 13. **Iconos:** se agrega Bootstrap Icons, copiado a `wwwroot/lib/bootstrap-icons`.
+14. **Formularios en modal:** crear y editar se hacen en un modal; no hay páginas propias.
+15. **Editar desde el detalle:** el modal se abre sobre el detalle y al guardar se recarga el detalle.
+16. **Card "Nuevo libro" de la portada:** lleva al listado con el modal abierto.
 
 ## Preguntas abiertas
 
