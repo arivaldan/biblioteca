@@ -35,5 +35,7 @@ dotnet run --project src/Biblioteca.Web                  # terminal 2 → http:/
 - [`docs/guia-instalacion.md`](docs/guia-instalacion.md): instalación paso a paso.
 - [`CLAUDE.md`](CLAUDE.md): arquitectura, convenciones y reglas del proyecto (también las lee
   Claude Code).
+- [`docs/flujo-aplicacion.md`](docs/flujo-aplicacion.md): cómo viajan los datos desde el
+  navegador hasta la base y de vuelta.
 - [`docs/estado-actual.md`](docs/estado-actual.md): qué está hecho y qué sigue.
 - [`docs/specs/`](docs/specs): especificación de cada funcionalidad.
